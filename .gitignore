@@ -1,3 +1,6 @@
+*.xml
+*.tcx
+*.fit
 *.gpx
 *.tcx.gz
 *.fit.gz
