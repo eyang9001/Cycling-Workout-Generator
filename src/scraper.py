@@ -3,19 +3,19 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.keys import Keys
 import time
 
 # used https://medium.com/the-andela-way/introduction-to-web-scraping-using-selenium-7ec377a8cf72 as original template
 
-def scrape_TR(user_log, user_pass):
-    timeout=20
-    max_downloads=100
-
+def scrape_TR(user_log, user_pass, driver_path, max_downloads):
+    timeout = 20
+    driver_path = '/Users/eggfooyang/Downloads/chromedriver'
     option = webdriver.ChromeOptions()
     option.add_argument(" - incognito")
 
     # download the driver from https://chromedriver.chromium.org/downloads
-    browser = webdriver.Chrome(executable_path='/Users/eggfooyang/Downloads/chromedriver', options=option)
+    browser = webdriver.Chrome(executable_path=driver_path, options=option)
     browser.get("https://www.trainerroad.com/login")
 
     # Sign in
@@ -43,8 +43,10 @@ def scrape_TR(user_log, user_pass):
         # Check if the ride was from strava or not. Only open up non-strava ones
         test_strava = ride.find_elements_by_xpath(".//span[@class='info--sync-source']")
         if len(test_strava) == 0:
-            print('found')
-            browser.get(ride_link)
+            # open up link in new tab
+            open_script = f"window.open('{ride_link}', 'new_window')"
+            browser.execute_script(open_script)
+            browser.switch_to.window(browser.window_handles[1])
             # wait for ride to load
             try:
                 WebDriverWait(browser, timeout).until(EC.visibility_of_element_located((By.CLASS_NAME,"past-ride__pr-chart")))
@@ -56,5 +58,9 @@ def scrape_TR(user_log, user_pass):
             dl_button = browser.find_element_by_xpath("//li[@id='mp-more-ride--download']")
             dl_button.click()
             time.sleep(2)
-            browser.back()
+            # close 2nd tab and go back to first
+            browser.close()
+            browser.switch_to.window(browser.window_handles[0])
             WebDriverWait(browser, timeout).until(EC.visibility_of_element_located((By.XPATH, "//a[@class='training-item training-item--past-ride']")))
+
+scrape_TR('username', 'password', '/Users/eggfooyang/Downloads/chromedriver', 200)
