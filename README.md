@@ -32,3 +32,21 @@ decompress_files(data_filepath, new_filepath)
 parse_fit_file('/path/to/.fit/file')
 read_xml_file('/path/to/.xml/file')
 ```
+
+Here is an example of what the data for a workout looks like:
+![image](https://user-images.githubusercontent.com/30561629/71534686-07570300-28c6-11ea-8077-258ee6c8dff8.png)
+
+## 2. Generating a linear model to predict Heart Rate
+
+Using the datafiles, a linear model was generated with 4 weights, where the input to the model requires:
+1. current heart rate
+2. current power
+3. current cadence
+
+and it outputs the heart rate for the next second. The training data was normalized and then the model weights were tuned with gradient descent. The resulting model was able to imitate my heart rate pretty well:
+![image](https://user-images.githubusercontent.com/30561629/71534905-8567d980-28c7-11ea-9df6-42df37e265a3.png)
+
+However when the model is only seeded with the initial state and the subsequent timesteps use the previous predictions as the inputs to the next, the error propogation is noticeable:
+![image](https://user-images.githubusercontent.com/30561629/71534917-9d3f5d80-28c7-11ea-89f3-c2dd43e3493a.png)
+
+
