@@ -17,7 +17,7 @@ The secondary purpose of this project is to put the skills I've accumulated thro
 
 ## 1. Data Gathering
 
-Sadly the most boring part of this, but required nonetheless. All of my cycling rides (indoor and outdoor) are stored on my Strava account. Strava has a nice feature that lets you bulk export all of your files. The not-so-nice part is that they come in varying formats (.gpx, .fit, .tcx), and they are all .gz compressed. The even-less-nice-part of the bulk export is that it doesn't include any indoor rides (ones that don't include any gps data) which includes all of my TrainerRoad rides.  
+Sadly the most boring part, but required nonetheless. All of my cycling rides (indoor and outdoor) are stored on my Strava account. Strava has a nice feature that lets you bulk export all of your files. The not-so-nice part is that they come in varying formats (.gpx, .fit, .tcx), and they are all .gz compressed. The even-less-nice-part of the bulk export is that it doesn't include any indoor rides (ones that don't include any gps data) which includes all of my TrainerRoad rides.  
 1. Steps for Strava's bulk export can be found [here](https://support.strava.com/hc/en-us/articles/216918437-Exporting-your-Data-and-Bulk-Export). 
 2. Unfortunately TrainerRoad doesn't have a bulk export feature, so I scripted a webscraper using Selenium ([src/scraper.py](https://github.com/eyang9001/Cycling-Workout-Generator/blob/master/src/scraper.py)) to pull them down as .fit files. In order to use this, you'll need the Selenium library installed and [ChromeDriver] (https://chromedriver.chromium.org/downloads) downloaded. The location of ChromeDriver is needed as a parameter:
 ```python
