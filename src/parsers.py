@@ -3,29 +3,46 @@ import pandas as pd
 import numpy as np
 from xml.etree import ElementTree
 from fitparse import FitFile
+from datetime import datetime
 
-def parse_fit_file(file_path):
+def parse_fit_file(file_path, rename=False):
 # parses fit files
     fitfile = FitFile(file_path)
     hrs = []
     pwrs = []
     cads = []
     times = []
+    stime = None
     for record in fitfile.get_messages('record'):
         rec_dict = record.get_values()
+        if stime == None:
+            stime = rec_dict['timestamp'] #stores the initial datetime for the ride
+            if rename:
+                new_fname = stime.strftime("%Y-%m-%dT%H_%M_%S")+'.fit'      # renames the file to the datetime
+                folder = file_path[:file_path.rfind('/') + 1]
+                os.rename(file_path, folder+new_fname)
         if ('power' in rec_dict) & ('cadence' in rec_dict) & ('heart_rate' in rec_dict):
             pwrs.append(rec_dict['power'])
             cads.append(rec_dict['cadence'])
             hrs.append(rec_dict['heart_rate'])
             times.append(rec_dict['timestamp'])
     # df = pd.DataFrame(list(zip(times, hrs, pwrs, cads)), columns=['time', 'hr', 'pwr', 'cad'])
-    return (hrs, pwrs, cads)
+    return (hrs, pwrs, cads, stime)
 
-def read_xml_file(fileName):
+def read_xml_file(fileName, rename=False):
 # parses xml files
     full_file = os.path.abspath(os.path.join(fileName))
     dom = ElementTree.parse(full_file)
     loc = '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}'
+
+    root = dom.getroot()
+    timestamp = root[0][0][0].text                  # Gets the datetime from file
+    timestamp = timestamp.replace(':', '_')[:-1]
+    if rename:
+        folder = fileName[:fileName.rfind('/') + 1]
+        os.rename(fileName, folder+timestamp+'.xml')    # renames the file to the datestamp
+    datestring = timestamp[:10]
+    dt = datetime.strptime(datestring, '%Y-%m-%d')
 
     hr = []
     pwr = []
@@ -58,6 +75,9 @@ def read_xml_file(fileName):
     cad_data = np.array([i[0] for i in data])
     pwr_data = np.array([i[1] for i in data])
     hr_data = np.array([i[2] for i in data])
-    return (hr_data, cad_data, pwr_data)
+    return (hr_data, cad_data, pwr_data, dt)
 
-(hr_data, cad_data, pwr_data) = read_xml_file('../data/3104352099.xml')
+
+
+#(hr_data, cad_data, pwr_data, dt) = read_xml_file('../data/2019-12-07T18_54_21.xml')
+(hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2075244199.fit')

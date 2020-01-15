@@ -1,7 +1,6 @@
 import os
 import gzip
 import shutil
-from fitparse import FitFile
 
 def decompress_files(data_filepath, new_filepath):
 # pass in the folderpath of the raw .tcx.gz files as the 'data_filepath' variable, and location for the uncompressed files
