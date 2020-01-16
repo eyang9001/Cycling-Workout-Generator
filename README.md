@@ -54,7 +54,7 @@ However when the model is only seeded with the initial state and the subsequent 
 A heart-rate based workout with specified targets over time was generated:
 ![image](https://user-images.githubusercontent.com/30561629/72549404-3ffb5400-3856-11ea-8ae7-2401a1a1099e.png)
 
-Using this target series, a PID model using gradient descent was used alongside the linear model generated in step #2 in order to find the power and cadence input required to match the target heart-rate as close as possible:
+Using this target series, a PID model using gradient descent was used alongside the linear model generated in step #2 to find the power and cadence input required to match the target heart-rate as close as possible:
 
 ### Training Progress:
 ![image](https://user-images.githubusercontent.com/30561629/72549720-d7f93d80-3856-11ea-8980-83751bcb2a0e.png)
