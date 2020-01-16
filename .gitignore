@@ -4,3 +4,4 @@
 *.gpx
 *.tcx.gz
 *.fit.gz
+*.npy

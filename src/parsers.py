@@ -13,20 +13,22 @@ def parse_fit_file(file_path, rename=False):
     cads = []
     times = []
     stime = None
-    for record in fitfile.get_messages('record'):
-        rec_dict = record.get_values()
-        if stime == None:
-            stime = rec_dict['timestamp'] #stores the initial datetime for the ride
-            if rename:
-                new_fname = stime.strftime("%Y-%m-%dT%H_%M_%S")+'.fit'      # renames the file to the datetime
-                folder = file_path[:file_path.rfind('/') + 1]
-                os.rename(file_path, folder+new_fname)
-        if ('power' in rec_dict) & ('cadence' in rec_dict) & ('heart_rate' in rec_dict):
-            pwrs.append(rec_dict['power'])
-            cads.append(rec_dict['cadence'])
-            hrs.append(rec_dict['heart_rate'])
-            times.append(rec_dict['timestamp'])
-    # df = pd.DataFrame(list(zip(times, hrs, pwrs, cads)), columns=['time', 'hr', 'pwr', 'cad'])
+    try:
+        for record in fitfile.get_messages('record'):
+            rec_dict = record.get_values()
+            if stime == None:
+                stime = rec_dict['timestamp'] #stores the initial datetime for the ride
+                if rename:
+                    new_fname = stime.strftime("%Y-%m-%dT%H_%M_%S")+'.fit'      # renames the file to the datetime
+                    folder = file_path[:file_path.rfind('/') + 1]
+                    os.rename(file_path, folder+new_fname)
+            if ('power' in rec_dict) & ('cadence' in rec_dict) & ('heart_rate' in rec_dict):
+                pwrs.append(rec_dict['power'])
+                cads.append(rec_dict['cadence'])
+                hrs.append(rec_dict['heart_rate'])
+                times.append(rec_dict['timestamp'])
+    except AttributeError: # for corrupt files
+        pass
     return (hrs, pwrs, cads, stime)
 
 def read_xml_file(fileName, rename=False):
@@ -51,18 +53,18 @@ def read_xml_file(fileName, rename=False):
     for trackpoints in dom.iter(loc + 'Trackpoint'):
         try:
             cur_cad = int(trackpoints.find(loc + 'Cadence').text)
-        except AttributeError:
+        except AttributeError: # if there is no cadence for this record, don't save
             cur_cad = -1
         try:
             rate = trackpoints.find(loc + 'HeartRateBpm')
             cur_hr = int(rate.find(loc + 'Value').text)
-        except AttributeError:
+        except AttributeError: # if there is no heart rate for this record, don't save
             cur_hr = -1
         extensions = trackpoints.find(loc + 'Extensions')
         try:
             TPX = extensions.find('{http://www.garmin.com/xmlschemas/ActivityExtension/v2}TPX')
             cur_pwr = int(TPX.find('{http://www.garmin.com/xmlschemas/ActivityExtension/v2}Watts').text)
-        except AttributeError:
+        except AttributeError: # if there is no power for this record, don't save
             cur_pwr = -1
         # getting rid of dropout from the power meter
         if cur_pwr > 0 and cur_hr > 0 and cur_cad > 0:
@@ -77,7 +79,37 @@ def read_xml_file(fileName, rename=False):
     hr_data = np.array([i[2] for i in data])
     return (hr_data, cad_data, pwr_data, dt)
 
-
+def parse_store_all(folderpath='data/', save_prefix='all_data'):
+    # This parses all the .fit and .xml files in a folder and saves them as a .npy array
+    hrs = []
+    pws = []
+    cads = []
+    dates = []
+    for item in os.listdir(folderpath):
+        # print(item)
+        if item.endswith('.xml'):
+            try:
+                (hr_data, cad_data, pwr_data, dt) = read_xml_file(folderpath + item)
+                hrs.append(hr_data)
+                cads.append(cad_data)
+                pws.append(pwr_data)
+                dates.append(dt)
+            except AttributeError:
+                pass
+        if item.endswith('.fit'):
+            try:
+                (hr_data, cad_data, pwr_data, dt) = parse_fit_file(folderpath + item)
+                hrs.append(hr_data)
+                cads.append(cad_data)
+                pws.append(pwr_data)
+                dates.append(dt)
+            except AttributeError:
+                pass
+    np.save(folderpath + save_prefix + '_hr.npy', hrs)
+    np.save(folderpath + save_prefix + '_cad.npy', cads)
+    np.save(folderpath + save_prefix + '_pwr.npy', pws)
+    np.save(folderpath + save_prefix + '_dates.npy', dates)
 
 #(hr_data, cad_data, pwr_data, dt) = read_xml_file('../data/2019-12-07T18_54_21.xml')
-(hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2075244199.fit')
+# (hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2751540892.fit') # This was the troublesome file
+# (hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2713801710.fit')
