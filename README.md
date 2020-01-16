@@ -49,4 +49,18 @@ and it outputs the heart rate for the next second. The training data was normali
 However when the model is only seeded with the initial state and the subsequent timesteps use the previous predictions as the inputs to the next, the error propogation is noticeable:
 ![image](https://user-images.githubusercontent.com/30561629/71534917-9d3f5d80-28c7-11ea-89f3-c2dd43e3493a.png)
 
+## 3. Generating Workout
 
+A heart-rate based workout with specified targets over time was generated:
+![image](https://user-images.githubusercontent.com/30561629/72549404-3ffb5400-3856-11ea-8ae7-2401a1a1099e.png)
+
+Using this target series, a PID model using gradient descent was used alongside the linear model generated in step #2 in order to find the power and cadence input required to match the target heart-rate as close as possible:
+
+### Training Progress:
+![image](https://user-images.githubusercontent.com/30561629/72549720-d7f93d80-3856-11ea-8980-83751bcb2a0e.png)
+
+### Final Output:
+![image](https://user-images.githubusercontent.com/30561629/72549782-f6f7cf80-3856-11ea-901b-0f0730317171.png)
+
+To simplify the model by minimizing the search-space, cadence was set to a constant 95. To keep the required power realistic, the power output was capped at 800 watts and minimum set to 0 (coasting). 
+As you can see from the 'predicted' line, the predicted heart-rate does a good job resembling the characteristics of a person's real heart rate. It isn't possible for the heart rate to change instantaneously like the target curve, so the gradual build up and drop-off (when coasting) resembles how the body physiologically reacts to changes in effort (power).
