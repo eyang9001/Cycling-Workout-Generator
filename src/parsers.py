@@ -23,13 +23,14 @@ def parse_fit_file(file_path, rename=False):
                     folder = file_path[:file_path.rfind('/') + 1]
                     os.rename(file_path, folder+new_fname)
             if ('power' in rec_dict) & ('cadence' in rec_dict) & ('heart_rate' in rec_dict):
-                pwrs.append(rec_dict['power'])
-                cads.append(rec_dict['cadence'])
-                hrs.append(rec_dict['heart_rate'])
-                times.append(rec_dict['timestamp'])
+                if (rec_dict['power'] is not None) & (rec_dict['cadence'] is not None) & (rec_dict['heart_rate'] is not None): # only include timestamps that have all 3 values
+                    pwrs.append(rec_dict['power'])
+                    cads.append(rec_dict['cadence'])
+                    hrs.append(rec_dict['heart_rate'])
+                    times.append(rec_dict['timestamp'])
     except AttributeError: # for corrupt files
         pass
-    return (hrs, pwrs, cads, stime)
+    return (np.array(hrs), np.array(pwrs), np.array(cads), stime)
 
 def read_xml_file(fileName, rename=False):
 # parses xml files
@@ -77,39 +78,69 @@ def read_xml_file(fileName, rename=False):
     cad_data = np.array([i[0] for i in data])
     pwr_data = np.array([i[1] for i in data])
     hr_data = np.array([i[2] for i in data])
-    return (hr_data, cad_data, pwr_data, dt)
+    return (hr_data, pwr_data, cad_data, dt)
 
-def parse_store_all(folderpath='data/', save_prefix='all_data'):
+def parse_store_all(folderpath='../data/', save_prefix='all_data', clean=True):
     # This parses all the .fit and .xml files in a folder and saves them as a .npy array
+    # Clean will clean the data
     hrs = []
     pws = []
     cads = []
     dates = []
+    count = 0
     for item in os.listdir(folderpath):
-        # print(item)
+        print(item)
         if item.endswith('.xml'):
             try:
-                (hr_data, cad_data, pwr_data, dt) = read_xml_file(folderpath + item)
-                hrs.append(hr_data)
-                cads.append(cad_data)
-                pws.append(pwr_data)
-                dates.append(dt)
+                (hr_data, pwr_data, cad_data, dt) = read_xml_file(folderpath + item)
             except AttributeError:
                 pass
         if item.endswith('.fit'):
             try:
-                (hr_data, cad_data, pwr_data, dt) = parse_fit_file(folderpath + item)
-                hrs.append(hr_data)
-                cads.append(cad_data)
-                pws.append(pwr_data)
-                dates.append(dt)
+                (hr_data, pwr_data, cad_data, dt) = parse_fit_file(folderpath + item)
             except AttributeError:
                 pass
-    np.save(folderpath + save_prefix + '_hr.npy', hrs)
-    np.save(folderpath + save_prefix + '_cad.npy', cads)
-    np.save(folderpath + save_prefix + '_pwr.npy', pws)
-    np.save(folderpath + save_prefix + '_dates.npy', dates)
+        if len(hr_data) > 0:        # only save if the file stored all hr, cad and power
+            print(count)
+            if clean:
+                df = pd.DataFrame()
+                df['HR'] = hr_data
+                df['CAD'] = cad_data
+                df['PWR'] = pwr_data
+                # deletes instances of heart rate below resting heart rate
+                df = df[df['HR'] > 75]
+
+                hr_data = np.array(df['HR'])
+                cad_data = np.array(df['CAD'])
+                pwr_data = np.array(df['PWR'])
+
+            hrs.append(hr_data)
+            cads.append(cad_data)
+            pws.append(pwr_data)
+            dates.append(dt)
+            count += 1
+
+    # Sort by date
+    df = pd.DataFrame()
+    df['Date'] = dates
+    df['HR'] = hrs
+    df['CAD'] = cads
+    df['PWR'] = pws
+    df = df.sort_values(by=['Date'])
+
+    # Save to .npy files
+    np.save(folderpath + save_prefix + '_hr.npy', np.array(df['HR']))
+    np.save(folderpath + save_prefix + '_cad.npy', np.array(df['CAD']))
+    np.save(folderpath + save_prefix + '_pwr.npy', np.array(df['PWR']))
+    np.save(folderpath + save_prefix + '_dates.npy', np.array(df['Date']))
 
 #(hr_data, cad_data, pwr_data, dt) = read_xml_file('../data/2019-12-07T18_54_21.xml')
 # (hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2751540892.fit') # This was the troublesome file
-# (hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2713801710.fit')
+# (hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2019-12-23T00_01_43.fit')
+# print(hr_data)
+# File 2019-08-31T12_10_14 deleted because of bad hr data
+# File 2019-12-23T00_01_43 also deleted because of bad hr data
+# File 2019-09-17T21_41_02 deleted bad hr data
+# FIle 2019-06-30T12_13_11 bad hr
+
+parse_store_all(save_prefix='all_data')
