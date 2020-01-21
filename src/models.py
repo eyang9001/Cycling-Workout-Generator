@@ -366,7 +366,7 @@ def back_least_squares(w, hr, cad, pwr, hr_next, steps):
     cost = np.sum((hr1[0] - hr_next[0]) ** 2)
     return cost / hr.size
 
-def model_all_data(data_folder):
+def model_all_data(data_folder, steps):
     # Runs the whole pipeline for taking in all data and generating a linear model to predict the next heart rate
     dataset = read_all_files(data_folder)
     # Save the gathered data in a .npy file for later use
@@ -397,7 +397,7 @@ def model_all_data(data_folder):
     g = lambda w, hr=hr_normalized, cad=cad_normalized, pwr=pwr_normalized, hr_next=hr_next_normalized: least_squares_set(w, hr, cad, pwr, hr_next)
     w_size = 4  # The number of weights
     w_init = 0.1 * np.random.randn(w_size, 1)
-    max_its = 30
+    max_its = steps
     alpha = 10 ** (-1)
     w_hist, train_hist = gradient_descent(g, w_init, alpha, max_its, verbose=True)
 
