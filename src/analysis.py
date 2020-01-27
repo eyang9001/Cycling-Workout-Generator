@@ -6,18 +6,20 @@ from xml.etree import ElementTree
 from fitparse import FitFile
 from datetime import datetime
 
-def find_max_hr(file_prefix='all_data'):
+def find_max_hr(file_prefix='../data/all_data'):
     # Load data
-    hrs = np.load('data/' + file_prefix + '_hr.npy')
-    cads = np.load('data/' + file_prefix + '_cad.npy')
-    pws = np.load('data/' + file_prefix + '_pwr.npy')
-    dates = np.load('data/' + file_prefix + '_dates.npy')
+    hrs = np.load(file_prefix + '_hr.npy', allow_pickle=True)
+    dates = np.load(file_prefix + '_dates.npy', allow_pickle=True)
 
-    max = max(hrs)
-    indices = hrs.index(max)
-    max_dates = dates[indices]
-
-    print('Max heart rate: ' + str(max))
+    cur_max = 0
+    for i in range(len(hrs)):
+        if max(hrs[i]) > cur_max:
+            cur_max = max(hrs[i])
+            max_index = [i]
+        elif max(hrs[i]) == cur_max:
+            max_index.append(i)
+    max_dates = dates[max_index]
+    print('Max Heart Rate: ' + str(cur_max))
     print('Dates: ' + str(max_dates))
 
 if __name__ == "__main__":
