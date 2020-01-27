@@ -22,4 +22,5 @@ def decompress_files(data_filepath, new_filepath):
                     with open(new_filepath + item[:-3], 'wb') as f_out:
                         shutil.copyfileobj(f_in, f_out)
 
-decompress_files('../raw_data/', '../data/')
+if __name__ == "__main__":
+    decompress_files('../raw_data/', '../data/')

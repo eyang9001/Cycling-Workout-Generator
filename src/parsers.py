@@ -134,13 +134,14 @@ def parse_store_all(folderpath='../data/', save_prefix='all_data', clean=True):
     np.save(folderpath + save_prefix + '_pwr.npy', np.array(df['PWR']))
     np.save(folderpath + save_prefix + '_dates.npy', np.array(df['Date']))
 
-#(hr_data, cad_data, pwr_data, dt) = read_xml_file('../data/2019-12-07T18_54_21.xml')
-# (hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2751540892.fit') # This was the troublesome file
-# (hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2019-12-23T00_01_43.fit')
-# print(hr_data)
-# File 2019-08-31T12_10_14 deleted because of bad hr data
-# File 2019-12-23T00_01_43 also deleted because of bad hr data
-# File 2019-09-17T21_41_02 deleted bad hr data
-# FIle 2019-06-30T12_13_11 bad hr
+if __name__ == "__main__":
+    #(hr_data, cad_data, pwr_data, dt) = read_xml_file('../data/2019-12-07T18_54_21.xml')
+    # (hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2751540892.fit') # This was the troublesome file
+    # (hr_data, cad_data, pwr_data, dt) = parse_fit_file('../data/2019-12-23T00_01_43.fit')
+    # print(hr_data)
+    # File 2019-08-31T12_10_14 deleted because of bad hr data
+    # File 2019-12-23T00_01_43 also deleted because of bad hr data
+    # File 2019-09-17T21_41_02 deleted bad hr data
+    # FIle 2019-06-30T12_13_11 bad hr
 
-parse_store_all(save_prefix='all_data')
+    parse_store_all(save_prefix='all_data')
