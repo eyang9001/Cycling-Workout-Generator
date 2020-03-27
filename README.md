@@ -2,7 +2,7 @@
 
 This is a passion project of mine to utilize my cycling data and see what insights I can extract regarding my fitness over time as well as prototyping other possible functions. This 'project' has grown over time, as I think of more products that can be developed from the data.
 
-### Background & Motivation: 
+### Background & Motivation
 In cycling, heart rate is often used as a metric to evaluate an athlete's effort and sometimes used to tailor workouts at specific heart rate zones. However, it is known that heart rate is unique to each person in many ways. Not only can their resting and max heart rate be different, but their bodies can respond to cadences differently (some can maintain high cadence while others need slower cadences) as well as have different power profiles (some can put out short high-bursts of power while maintaining a consistent heart rate, while others can maintain moderate power for long periods of time). Due to all of these unique factors, a model that predicts heart rate will have to be athlete-specific. Additionally, with a linear model, the learned weights can be used as a fitness metric. It may not be best used to compare athletes to athletes, but there is potential to track variations in fitness by training models using recent data and comparing to previously trained weights.
 
 The secondary purpose of this project is to put the skills I've accumulated through classes to work. Skills I demonstrate (some learned specifically for this) through this project include: 
