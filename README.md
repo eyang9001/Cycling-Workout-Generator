@@ -34,7 +34,7 @@ read_xml_file('/path/to/.xml/file')
 ```
 
 Here is an example of what the data for a workout looks like:
-![image](https://user-images.githubusercontent.com/30561629/71534686-07570300-28c6-11ea-8077-258ee6c8dff8.png)
+![image](https://user-images.githubusercontent.com/30561629/79378004-30a5a880-7f22-11ea-843c-fbb6695df54d.png)
 
 ## 2. Generating a linear model to predict Heart Rate
 
