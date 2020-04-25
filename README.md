@@ -46,7 +46,7 @@ Using the datafiles, a linear model was generated with 4 weights, where the inpu
 and it outputs the heart rate for the next second. The training data was normalized and then the model weights were tuned with gradient descent. The resulting model was able to imitate my heart rate pretty well:
 ![image](https://user-images.githubusercontent.com/30561629/71534940-cfe95600-28c7-11ea-9f9e-dc6201a0d5da.png)
 
-However when the model is only seeded with the initial state and the subsequent timesteps use the previous predictions as the inputs to the next, the error propogation is noticeable:
+However when the model is only seeded with the initial state and the subsequent timesteps use the previous predictions as the inputs to the next, the error propogation is much more noticeable:
 ![image](https://user-images.githubusercontent.com/30561629/71534917-9d3f5d80-28c7-11ea-89f3-c2dd43e3493a.png)
 
 ## 3. Generating Workout
